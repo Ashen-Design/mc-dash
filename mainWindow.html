@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Server Management Console</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+    <link href="assets/css/mainWindow.css" rel="stylesheet">
+  </head>
+  <body>
+
+    <nav>
+      <div class="nav-wrapper blue darken-1"><a href="#" class="brand-logo center">Server Management Console</a></div>
+    </nav>
+
+    <div class="container">
+
+    <div class="row">
+
+      <form class="col s12">
+
+        <div class="row">
+        <div class="input-field col s12">
+          <input id="ipaddress" type="text" class="validate">
+          <label for="ipaddress">IP Address</label>
+        </div>
+      </div>
+
+        <div class="row">
+          <div class="input-field col s6">
+            <input id="port" type="text" class="validate">
+            <label for="port">Port</label>
+          </div>
+        <div class="input-field col s6">
+          <input id="password" type="password" class="validate">
+          <label for="password">Password</label>
+        </div>
+      </div>
+
+      <div class="input-field col s6">
+        <a class="waves-effect waves-light btn center-align blue darken-1" id="connectBtn">Connect</a>
+      </div>
+
+        <div class="input-field col s6">
+        <a class="waves-effect waves-light btn center-align blue darken-1" id="quickConnectBtn">Quick Connect</a>
+      </div>
+
+      <div class="section"><h5>Command Menu:</h5></div>
+
+      <div class="input-field col s12">
+        <input value="" id="commandPrompt" type="text" class="validate">
+        <label for="commandPrompt">Enter command...</label>
+      </div>
+
+          <div class="input-field col s12">
+          <a class="waves-effect waves-light btn blue darken-1" id="sendBtn">Send Command</a>
+          </div>
+
+        <div class="input-field col s12">
+        <input disabled placeholder="" value="" id="console" type="text" class="validate">
+        <label for="console">Last Response</label>
+        </div>
+
+  <!--      <div class="row">
+          <div class="input-field col s12">
+            <h5>Quick Actions:</h5>
+            <a class="waves-effect waves-light btn blue darken-1" id="listBtn">List Players</a>
+            <a class="waves-effect waves-light btn blue darken-1" id="restartBtn">Restart Server</a>
+          </div>
+        </div>
+-->
+      </form>
+    </div>
+</div>
+    <script>
+    const electron = require('electron');
+    var auth = require('./auth.json');
+    const {ipcRenderer} = electron;
+    const remote = require('electron').remote;
+    const consoleBox = document.getElementById("console");
+    const connectBtn = document.getElementById("connectBtn");
+    const quickConnectBtn = document.getElementById("quickConnectBtn");
+    const rconIP = document.getElementById("ipaddress");
+    const rconPort = document.getElementById("port");
+    const rconPassword = document.getElementById("password");
+    const sendBtn = document.getElementById("sendBtn");
+    const commandPrompt = document.getElementById("commandPrompt");
+    var quickIP;
+    var quickPort;
+    var quickPassword;
+
+    var fs = require('fs'),
+    obj
+    fs.readFile('./auth.json', handleAuth)
+
+
+    function handleAuth(err, data){
+      if(err) throw error
+      obj = JSON.parse(data)
+
+      quickIP = obj.ip
+      quickPort = obj.port
+      quickPassword = obj.password
+
+    }
+
+    ipcRenderer.on('connectedText', (e, args) => {
+      consoleBox.value = args;
+      M.toast({html:args})
+    })
+
+    ipcRenderer.on('commandUsed', (e, args) => {
+      consoleBox.value = args;
+      M.toast({html:args})
+    })
+
+    connectBtn.addEventListener('click', function() {
+      if(rconIP.value != '' || rconPort.value != '' || rconPassword.value != ''){
+        let data = {
+          authIP: rconIP.value,
+          authPort: rconPort.value,
+          authPassword: rconPassword.value
+        }
+      ipcRenderer.send('rcon:connected', data)
+      }
+    });
+
+    quickConnectBtn.addEventListener('click', function() {
+      if(quickIP != '' || quickPort != '' || quickPassword != ''){
+        let data = {
+          authIP: quickIP,
+          authPort: quickPort,
+          authPassword: quickPassword
+        }
+      ipcRenderer.send('rcon:connected', data)
+      }
+    });
+
+    sendBtn.addEventListener('click', function() {
+        var command = commandPrompt.value
+      ipcRenderer.send('rcon:command', command)
+    });
+    </script>
+  </body>
+</html>
