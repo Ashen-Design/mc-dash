@@ -17,3 +17,5 @@ There is currently an auth.json file you can fill in to allow for a Quick Connec
 To use it, simply fill in your server information and use the Quick Connect button on the application to speed up the connection process. Eventually this will be added to the production environment.
 
 ![Screenshot of Application](https://i.imgur.com/uUF6Fu5.png "Screenshot of Application")
+
+[![ko-fi](https://www.ko-fi.com/img/donate_sm.png)](https://ko-fi.com/T6T5H1L9)
